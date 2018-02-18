@@ -1,0 +1,10 @@
+.block {
+  width: 30px;
+  height: 30px;
+  background: #d8d2db;
+  border: #8f7ea5 1px solid;
+  margin: 0.5px;
+}
+.block.not-visible {
+  visibility: hidden;
+}
