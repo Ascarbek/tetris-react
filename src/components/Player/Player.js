@@ -8,6 +8,7 @@ import PlayBoard from '../PlayBoard/PlayBoard';
 import * as shapes from '../Figure/shapes';
 import { clearBoard } from "./board";
 import ActiveFigure from "../ActiveFigure/ActiveFigure";
+import GameOver from "../GameOver/GameOver";
 
 const boardWidth = 10;
 const boardHeight = 20;
@@ -23,16 +24,21 @@ class Player extends React.Component {
     this.moveRight = this.moveRight.bind(this);
     this.changeFigurePosition = this.changeFigurePosition.bind(this);
     this.fixFigureOnBoard = this.fixFigureOnBoard.bind(this);
-    this.startNewFigure = this.startNewFigure.bind(this);
     this.resetActiveFigure = this.resetActiveFigure.bind(this);
     this.drop = this.drop.bind(this);
 
+    let keys = Object.keys(shapes);
+    let rand = Math.floor(Math.random() * (keys.length));
+    let newShape = shapes[keys[rand]].call(null);
+
     this.state = {
       board: clearBoard,
-      left: 0,
+      left: Math.floor(boardWidth/2),
       top: 0,
-      playingShape: shapes.shapeZ(),
-      animateShape: true
+      shapeIndex: rand,
+      playingShape: newShape,
+      animateShape: true,
+      isGameOver: false
     };
 
     this.intervalHandle = setInterval(this.gameMove, 1000);
@@ -48,17 +54,31 @@ class Player extends React.Component {
   }
 
   resetActiveFigure(board, playingShape, left, top) {
-    let newBoard = this.fixFigureOnBoard(board, playingShape, left, top);
-
     let keys = Object.keys(shapes);
-    let rand = Math.floor(Math.random() * (keys.length));
 
+    let rand = Math.floor(Math.random() * (keys.length));
+    while (rand === this.state.shapeIndex){
+      rand = Math.floor(Math.random() * (keys.length));
+    }
     let newShape = shapes[keys[rand]].call(null);
+
+    let newBoard = this.fixFigureOnBoard(board, playingShape, left, top);
+    let newLeft = Math.trunc(boardWidth/2);
+
+    if(!this.canPutFigure(newBoard, newShape, newLeft, 0)) {
+      this.setState(Map(this.state)
+        .set('isGameOver', true)
+        .toJS()
+      );
+      clearInterval(this.intervalHandle);
+      return;
+    }
 
     this.setState(Map(this.state)
       .set('board', newBoard)
       .set('playingShape', newShape)
-      .set('left', 0)
+      .set('shapeIndex', rand)
+      .set('left', newLeft)
       .set('top', 0)
       .set('animateShape', false)
       .toJS()
@@ -74,10 +94,6 @@ class Player extends React.Component {
       }
     }
     return board;
-  }
-
-  startNewFigure() {
-
   }
 
   drop() {
@@ -192,6 +208,8 @@ class Player extends React.Component {
         <ActiveFigure left={this.state.left} top={this.state.top} shape={this.state.playingShape} animating={this.state.animateShape}>
 
         </ActiveFigure>
+
+        {this.state.isGameOver ? <GameOver/> : ''}
       </div>
     )
   }
