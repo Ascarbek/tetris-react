@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 
 import './ActiveFigure.css'
 
@@ -9,7 +10,7 @@ const padding = 5, blockSize = 31;
 class ActiveFigure extends React.Component {
   render() {
     return (
-      <div className="active-figure" style={{
+      <div className={classNames('active-figure', {'animating': this.props.animating})} style={{
         left: (padding + blockSize*this.props.left) + 'px',
         top: (padding + blockSize*this.props.top) + 'px'
       }}>

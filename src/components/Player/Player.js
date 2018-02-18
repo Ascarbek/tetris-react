@@ -31,7 +31,8 @@ class Player extends React.Component {
       board: clearBoard,
       left: 0,
       top: 0,
-      playingShape: shapes.shapeZ()
+      playingShape: shapes.shapeZ(),
+      animateShape: true
     };
 
     this.intervalHandle = setInterval(this.gameMove, 1000);
@@ -49,11 +50,15 @@ class Player extends React.Component {
   resetActiveFigure(board, playingShape, left, top) {
     let newBoard = this.fixFigureOnBoard(board, playingShape, left, top);
 
+    let keys = Object.keys(shapes);
+    let rand = Math.floor(Math.random() * (keys.length));
+
     this.setState(Map(this.state)
       .set('board', newBoard)
-      .set('playingShape', shapes.shapeT())
+      .set('playingShape', shapes[keys[rand]].call())
       .set('left', 0)
       .set('top', 0)
+      .set('animateShape', false)
       .toJS()
     );
   }
@@ -76,16 +81,8 @@ class Player extends React.Component {
   drop() {
     for(let r=0; r<boardHeight - this.state.top - this.state.playingShape.length + 1; r++) {
       if(!this.canPutFigure(this.state.board, this.state.playingShape, this.state.left, this.state.top + r)) {
-        this.changeFigurePosition(this.state.left, this.state.top + r - 1);
+        this.changeFigurePosition(this.state.left, this.state.top + r - 1, true);
 
-        /*let newBoard = this.fixFigureOnBoard(List(this.state.board).toJS(), List(this.state.playingShape).toJS(), this.state.left, this.state.top + r - 1);
-        this.setState(Map(this.state)
-          .set('board', newBoard)
-          .set('playingShape', shapes.shapeT())
-          .set('left', 0)
-          .set('top', 0)
-          .toJS()
-        );*/
         clearInterval(this.intervalHandle);
         setTimeout(() => {
           this.gameMove();
@@ -109,29 +106,30 @@ class Player extends React.Component {
     return true;
   }
 
-  changeFigurePosition(left, top) {
+  changeFigurePosition(left, top, animate) {
     this.setState(Map(this.state)
       .set('left', left)
       .set('top', top)
+      .set('animateShape', animate)
       .toJS()
     );
   }
 
   moveDown() {
-    this.changeFigurePosition(this.state.left, this.state.top + 1);
+    this.changeFigurePosition(this.state.left, this.state.top + 1, true);
   }
 
   moveLeft() {
     if((this.state.left > 0)
     && this.canPutFigure(this.state.board, this.state.playingShape, this.state.left - 1, this.state.top)) {
-      this.changeFigurePosition(this.state.left - 1, this.state.top);
+      this.changeFigurePosition(this.state.left - 1, this.state.top, true);
     }
   }
 
   moveRight() {
     if((this.state.left < boardWidth - this.state.playingShape[0].length + 1 - 1)
     && this.canPutFigure(this.state.board, this.state.playingShape, this.state.left + 1, this.state.top)) {
-      this.changeFigurePosition(this.state.left + 1, this.state.top);
+      this.changeFigurePosition(this.state.left + 1, this.state.top, true);
     }
   }
 
@@ -148,7 +146,7 @@ class Player extends React.Component {
 
     this.setState(Map(this.state)
       .set('playingShape', newShape)
-      .set('left', this.state.left + newShape[0].length > boardWidth ? this.state.left - 1 : this.state.left)
+      .set('left', this.state.left + newShape[0].length > boardWidth ? this.state.left - (this.state.left + newShape[0].length - boardWidth) : this.state.left)
       .toJS()
     );
   }
@@ -186,7 +184,7 @@ class Player extends React.Component {
 
         </PlayBoard>
 
-        <ActiveFigure left={this.state.left} top={this.state.top} shape={this.state.playingShape}>
+        <ActiveFigure left={this.state.left} top={this.state.top} shape={this.state.playingShape} animating={this.state.animateShape}>
 
         </ActiveFigure>
       </div>
