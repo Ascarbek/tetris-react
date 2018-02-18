@@ -53,9 +53,11 @@ class Player extends React.Component {
     let keys = Object.keys(shapes);
     let rand = Math.floor(Math.random() * (keys.length));
 
+    let newShape = shapes[keys[rand]].call(null);
+
     this.setState(Map(this.state)
       .set('board', newBoard)
-      .set('playingShape', shapes[keys[rand]].call())
+      .set('playingShape', newShape)
       .set('left', 0)
       .set('top', 0)
       .set('animateShape', false)
@@ -79,22 +81,25 @@ class Player extends React.Component {
   }
 
   drop() {
-    for(let r=0; r<boardHeight - this.state.top - this.state.playingShape.length + 1; r++) {
+    let r;
+    for(r=0; r<boardHeight - this.state.top - this.state.playingShape.length + 1; r++) {
       if(!this.canPutFigure(this.state.board, this.state.playingShape, this.state.left, this.state.top + r)) {
-        this.changeFigurePosition(this.state.left, this.state.top + r - 1, true);
-
-        clearInterval(this.intervalHandle);
-        setTimeout(() => {
-          this.gameMove();
-
-          this.intervalHandle = setInterval(this.gameMove, 1000);
-        }, 300);
-        return;
+        break;
       }
     }
+    this.changeFigurePosition(this.state.left, this.state.top + r - 1, true);
+
+    clearInterval(this.intervalHandle);
+    setTimeout(() => {
+      this.gameMove();
+
+      this.intervalHandle = setInterval(this.gameMove, 1000);
+    }, 300);
+
   }
 
   canPutFigure(board, shape, left, top) {
+    if(top + shape.length > boardHeight) return false;
     for(let fr=0; fr<shape.length; fr++) {
       for(let fc=0; fc<shape[fr].length; fc++) {
         if((board[top + fr][left + fc] !== 0) && (shape[fr][fc] !== 0)) {
