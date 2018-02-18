@@ -57,6 +57,9 @@ class Player extends React.Component {
     let keys = Object.keys(shapes);
 
     let rand = Math.floor(Math.random() * (keys.length));
+    /*
+    * make sure that new shape is not the same that was before
+    * */
     while (rand === this.state.shapeIndex){
       rand = Math.floor(Math.random() * (keys.length));
     }
