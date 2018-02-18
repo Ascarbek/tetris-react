@@ -33,6 +33,7 @@ class Player extends React.Component {
 
     this.state = {
       board: clearBoard,
+      outRows: [],
       left: Math.floor(boardWidth/2),
       top: 0,
       shapeIndex: rand,
@@ -77,15 +78,74 @@ class Player extends React.Component {
       return;
     }
 
-    this.setState(Map(this.state)
-      .set('board', newBoard)
-      .set('playingShape', newShape)
-      .set('shapeIndex', rand)
-      .set('left', newLeft)
-      .set('top', 0)
-      .set('animateShape', false)
-      .toJS()
-    );
+    let outRows = List(this.state.outRows).toJS();
+    let hasOutRows = false;
+    for(let br=0; br<newBoard.length; br++) {
+      let isOut = true;
+      for(let bc=0; bc<newBoard[br].length; bc++) {
+        if(newBoard[br][bc] === 0) {
+          isOut = false;
+        }
+      }
+      if(isOut) {
+        outRows[br] = true;
+        hasOutRows = true;
+      }
+    }
+
+    if(hasOutRows) {
+      clearInterval(this.intervalHandle);
+
+      this.setState(Map(this.state)
+        .set('board', newBoard)
+        .set('outRows', outRows)
+        .set('playingShape', newShape)
+        .set('shapeIndex', rand)
+        .set('left', newLeft)
+        .set('top', 0)
+        .set('animateShape', false)
+        .toJS()
+      );
+
+      for(let br=boardHeight-1; br>0; br--) {
+        if(outRows[br]) {
+          for(let mr=br; mr>0; mr--) {
+            for(let mc=0; mc<newBoard[mr].length; mc++) {
+              newBoard[mr][mc] = newBoard[mr - 1][mc];
+            }
+            outRows[mr] = outRows[mr - 1];
+          }
+          br++
+        }
+      }
+
+      setTimeout(() => {
+        this.setState(Map(this.state)
+          .set('board', newBoard)
+          .set('outRows', outRows)
+          .set('playingShape', newShape)
+          .set('shapeIndex', rand)
+          .set('left', newLeft)
+          .set('top', 0)
+          .set('animateShape', false)
+          .toJS()
+        );
+        this.intervalHandle = setInterval(this.gameMove, 1000);
+
+      }, 350);
+    }
+    else {
+      this.setState(Map(this.state)
+        .set('board', newBoard)
+        .set('outRows', outRows)
+        .set('playingShape', newShape)
+        .set('shapeIndex', rand)
+        .set('left', newLeft)
+        .set('top', 0)
+        .set('animateShape', false)
+        .toJS()
+      );
+    }
   }
 
   fixFigureOnBoard(board, shape, left, top) {
@@ -110,7 +170,7 @@ class Player extends React.Component {
 
     clearInterval(this.intervalHandle);
     setTimeout(() => {
-      this.gameMove();
+      // this.gameMove();
 
       this.intervalHandle = setInterval(this.gameMove, 1000);
     }, 300);
@@ -204,7 +264,7 @@ class Player extends React.Component {
   render() {
     return (
       <div id="player" className="player" onKeyDown={this.onKeyDown} tabIndex='1' onBlur={this.onBlur}>
-        <PlayBoard board={this.state.board}>
+        <PlayBoard board={this.state.board} outRows={this.state.outRows}>
 
         </PlayBoard>
 

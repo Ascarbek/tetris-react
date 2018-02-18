@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 
 import './PlayBoard.css';
 
@@ -9,7 +10,7 @@ class PlayBoard extends React.Component {
     return (
       <div className="play-board">
         {this.props.board.map((r, rowIndex) => (
-          <div key={rowIndex} className="board-row">{r.map((b, index) => (
+          <div key={rowIndex} className={classNames('board-row', {'scale-out': this.props.outRows[rowIndex]})}>{r.map((b, index) => (
             b === 1 ? <Block key={index} visible={true}/> : <Block key={index} visible={false}/>
           ))}</div>
         ))}

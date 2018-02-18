@@ -1,3 +1,10 @@
 .play-board .board-row {
   display: flex;
+  transition: 0.3s all ease-out;
+}
+.play-board .board-row.scale-out {
+  transform: scaleY(0);
+}
+.play-board .board-row.scale-out .block {
+  background: #4e3a66;
 }

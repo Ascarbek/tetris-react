@@ -1,5 +1,15 @@
+@import '../colors';
+
 .play-board {
   .board-row {
     display: flex;
+    transition: 0.3s all ease-out;
+
+    &.scale-out {
+      .block {
+        background: @blockClearing;
+      }
+      transform: scaleY(0);
+    }
   }
 }
