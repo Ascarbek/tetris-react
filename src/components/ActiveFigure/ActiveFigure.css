@@ -1,3 +1,4 @@
 .active-figure {
   position: absolute;
+  transition: 0.2s all ease-in-out;
 }

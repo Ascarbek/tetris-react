@@ -25,6 +25,7 @@ class Player extends React.Component {
     this.fixFigureOnBoard = this.fixFigureOnBoard.bind(this);
     this.startNewFigure = this.startNewFigure.bind(this);
     this.resetActiveFigure = this.resetActiveFigure.bind(this);
+    this.drop = this.drop.bind(this);
 
     this.state = {
       board: clearBoard,
@@ -41,14 +42,11 @@ class Player extends React.Component {
       this.moveDown();
     }
     else {
-      this.resetActiveFigure()
+      this.resetActiveFigure(List(this.state.board).toJS(), List(this.state.playingShape).toJS(), this.state.left, this.state.top);
     }
   }
 
-  resetActiveFigure() {
-    let {board, playingShape, left, top} = this.state;
-    board = List(board).toJS();
-    playingShape = List(playingShape).toJS();
+  resetActiveFigure(board, playingShape, left, top) {
     let newBoard = this.fixFigureOnBoard(board, playingShape, left, top);
 
     this.setState(Map(this.state)
@@ -73,6 +71,30 @@ class Player extends React.Component {
 
   startNewFigure() {
 
+  }
+
+  drop() {
+    for(let r=0; r<boardHeight - this.state.top - this.state.playingShape.length + 1; r++) {
+      if(!this.canPutFigure(this.state.board, this.state.playingShape, this.state.left, this.state.top + r)) {
+        this.changeFigurePosition(this.state.left, this.state.top + r - 1);
+
+        /*let newBoard = this.fixFigureOnBoard(List(this.state.board).toJS(), List(this.state.playingShape).toJS(), this.state.left, this.state.top + r - 1);
+        this.setState(Map(this.state)
+          .set('board', newBoard)
+          .set('playingShape', shapes.shapeT())
+          .set('left', 0)
+          .set('top', 0)
+          .toJS()
+        );*/
+        clearInterval(this.intervalHandle);
+        setTimeout(() => {
+          this.gameMove();
+
+          this.intervalHandle = setInterval(this.gameMove, 1000);
+        }, 300);
+        return;
+      }
+    }
   }
 
   canPutFigure(board, shape, left, top) {
@@ -126,14 +148,12 @@ class Player extends React.Component {
 
     this.setState(Map(this.state)
       .set('playingShape', newShape)
+      .set('left', this.state.left + newShape[0].length > boardWidth ? this.state.left - 1 : this.state.left)
       .toJS()
     );
   }
 
   onKeyDown(e) {
-    // 32
-    console.log(e.keyCode);
-
     if(e.keyCode === 37) {
       this.moveLeft();
     }
@@ -144,6 +164,10 @@ class Player extends React.Component {
 
     if(e.keyCode === 38) {
       this.rotate(this.state.playingShape);
+    }
+
+    if(e.keyCode === 32) {
+      this.drop();
     }
   }
 
