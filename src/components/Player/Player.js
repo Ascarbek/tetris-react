@@ -15,12 +15,16 @@ const boardHeight = 20;
 class Player extends React.Component {
   constructor() {
     super();
+    this.canPutFigure = this.canPutFigure.bind(this);
     this.moveDown = this.moveDown.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
     this.gameMove = this.gameMove.bind(this);
     this.moveLeft = this.moveLeft.bind(this);
     this.moveRight = this.moveRight.bind(this);
     this.changeFigurePosition = this.changeFigurePosition.bind(this);
+    this.fixFigureOnBoard = this.fixFigureOnBoard.bind(this);
+    this.startNewFigure = this.startNewFigure.bind(this);
+    this.resetActiveFigure = this.resetActiveFigure.bind(this);
 
     this.state = {
       board: clearBoard,
@@ -33,7 +37,54 @@ class Player extends React.Component {
   }
 
   gameMove() {
-    this.moveDown();
+    if(this.canPutFigure(this.state.board, this.state.playingShape, this.state.left, this.state.top + 1)) {
+      this.moveDown();
+    }
+    else {
+      this.resetActiveFigure()
+    }
+  }
+
+  resetActiveFigure() {
+    let {board, playingShape, left, top} = this.state;
+    board = List(board).toJS();
+    playingShape = List(playingShape).toJS();
+    let newBoard = this.fixFigureOnBoard(board, playingShape, left, top);
+
+    this.setState(Map(this.state)
+      .set('board', newBoard)
+      .set('playingShape', shapes.shapeT())
+      .set('left', 0)
+      .set('top', 0)
+      .toJS()
+    );
+  }
+
+  fixFigureOnBoard(board, shape, left, top) {
+    for(let fr=0; fr<shape.length; fr++) {
+      for (let fc = 0; fc < shape[fr].length; fc++) {
+        if(shape[fr][fc] === 1) {
+          board[top + fr][left + fc] = shape[fr][fc];
+        }
+      }
+    }
+    return board;
+  }
+
+  startNewFigure() {
+
+  }
+
+  canPutFigure(board, shape, left, top) {
+    for(let fr=0; fr<shape.length; fr++) {
+      for(let fc=0; fc<shape[fr].length; fc++) {
+        if((board[top + fr][left + fc] !== 0) && (shape[fr][fc] !== 0)) {
+          return false
+        }
+      }
+    }
+
+    return true;
   }
 
   changeFigurePosition(left, top) {
@@ -49,26 +100,50 @@ class Player extends React.Component {
   }
 
   moveLeft() {
-    if(this.state.left > 0) {
+    if((this.state.left > 0)
+    && this.canPutFigure(this.state.board, this.state.playingShape, this.state.left - 1, this.state.top)) {
       this.changeFigurePosition(this.state.left - 1, this.state.top);
     }
   }
 
   moveRight() {
-    if(this.state.left < boardWidth - this.state.playingShape[0].length + 1 - 1) {
+    if((this.state.left < boardWidth - this.state.playingShape[0].length + 1 - 1)
+    && this.canPutFigure(this.state.board, this.state.playingShape, this.state.left + 1, this.state.top)) {
       this.changeFigurePosition(this.state.left + 1, this.state.top);
     }
   }
 
+  rotate(shape) {
+    let newShape = [];
+    for(let fr=0; fr<shape.length; fr++) {
+      for(let fc=0; fc<shape[fr].length; fc++) {
+        if(!newShape[fc]) {
+          newShape[fc] = [];
+        }
+        newShape[fc][shape.length - fr - 1] = shape[fr][fc];
+      }
+    }
+
+    this.setState(Map(this.state)
+      .set('playingShape', newShape)
+      .toJS()
+    );
+  }
+
   onKeyDown(e) {
     // 32
+    console.log(e.keyCode);
 
     if(e.keyCode === 37) {
       this.moveLeft();
     }
 
     if(e.keyCode === 39) {
-      this.moveRight()
+      this.moveRight();
+    }
+
+    if(e.keyCode === 38) {
+      this.rotate(this.state.playingShape);
     }
   }
 
