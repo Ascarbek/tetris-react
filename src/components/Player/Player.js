@@ -39,6 +39,7 @@ class Player extends React.Component {
       shapeIndex: rand,
       playingShape: newShape,
       animateShape: true,
+      animateRows: false,
       isGameOver: false
     };
 
@@ -104,6 +105,7 @@ class Player extends React.Component {
         .set('left', newLeft)
         .set('top', 0)
         .set('animateShape', false)
+        .set('animateRows', true)
         .toJS()
       );
 
@@ -128,6 +130,7 @@ class Player extends React.Component {
           .set('left', newLeft)
           .set('top', 0)
           .set('animateShape', false)
+          .set('animateRows', false)
           .toJS()
         );
         this.intervalHandle = setInterval(this.gameMove, 1000);
@@ -263,7 +266,7 @@ class Player extends React.Component {
   render() {
     return (
       <div id="player" className="player" onKeyDown={this.onKeyDown} tabIndex='1' onBlur={this.onBlur}>
-        <PlayBoard board={this.state.board} outRows={this.state.outRows}>
+        <PlayBoard board={this.state.board} outRows={this.state.outRows} animateRows={this.state.animateRows}>
 
         </PlayBoard>
 

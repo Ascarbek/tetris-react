@@ -3,13 +3,18 @@
 .play-board {
   .board-row {
     display: flex;
-    transition: 0.3s all ease-out;
 
     &.scale-out {
       .block {
         background: @blockClearing;
       }
       transform: scaleY(0);
+    }
+  }
+
+  &.animate-rows {
+    .board-row {
+      transition: 0.3s all ease-out;
     }
   }
 }
