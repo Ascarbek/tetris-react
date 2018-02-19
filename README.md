@@ -3,4 +3,5 @@
 ## This is a fun project written on react
 
 To run the game:
-** npm run start **
+
+**npm run start**
