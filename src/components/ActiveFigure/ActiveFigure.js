@@ -5,7 +5,7 @@ import './ActiveFigure.css'
 
 import Figure from "../Figure/Figure";
 
-const padding = 5, blockSize = 31;
+const padding = 5, blockSize = 26;
 
 class ActiveFigure extends React.Component {
   render() {

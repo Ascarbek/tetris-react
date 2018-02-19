@@ -30,6 +30,12 @@ export const shapeI = function() {
   ];
 };
 
+export const shapeI2 = function() {
+  return [
+    [1,1,1,1],
+  ];
+};
+
 export const shapeZ = function() {
   return [
     [0,1,1],

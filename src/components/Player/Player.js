@@ -170,9 +170,8 @@ class Player extends React.Component {
 
     clearInterval(this.intervalHandle);
     setTimeout(() => {
-      // this.gameMove();
-
       this.intervalHandle = setInterval(this.gameMove, 1000);
+      this.gameMove();
     }, 300);
 
   }
