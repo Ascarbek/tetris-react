@@ -1,4 +1,4 @@
-# Tetris Game 
+# in-Browser Tetris Game
 
 ## This is a fun project written on react
 
